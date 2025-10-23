@@ -1,0 +1,112 @@
+Question 21: Create a sample drawing app whose background should be white and where the user just draws something.
+Hint 1:- Use the inbuilt paint library of Dart.
+Source code:
+import 'package:flutter/material.dart';
+import 'dart:ui' as ui;
+
+void main() {
+  runApp(const MaterialApp(
+    debugShowCheckedModeBanner: false,
+    home: DrawingApp(),
+  ));
+}
+
+class DrawingApp extends StatefulWidget {
+  const DrawingApp({super.key});
+
+  @override
+  State<DrawingApp> createState() => _DrawingAppState();
+}
+
+class _DrawingAppState extends State<DrawingApp> {
+  List<DrawnLine> lines = [];
+  DrawnLine? currentLine;
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Simple Drawing App'),
+        backgroundColor: Colors.blueAccent,
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.delete),
+            onPressed: () {
+              setState(() {
+                lines.clear();
+              });
+            },
+          ),
+        ],
+      ),
+      backgroundColor: Colors.white, // White background
+      body: GestureDetector(
+        onPanStart: (details) {
+          setState(() {
+            currentLine = DrawnLine([details.localPosition],
+                Paint()
+                  ..color = Colors.black
+                  ..strokeWidth = 4.0
+                  ..strokeCap = StrokeCap.round
+                  ..isAntiAlias = true);
+          });
+        },
+        onPanUpdate: (details) {
+          setState(() {
+            currentLine?.points.add(details.localPosition);
+          });
+        },
+        onPanEnd: (details) {
+          setState(() {
+            if (currentLine != null) {
+              lines.add(currentLine!);
+            }
+            currentLine = null;
+          });
+        },
+        child: CustomPaint(
+          painter: DrawingPainter(lines: lines, currentLine: currentLine),
+          child: Container(),
+        ),
+      ),
+    );
+  }
+}
+
+/// Model to store each drawn line (points + paint)
+class DrawnLine {
+  List<Offset> points;
+  Paint paint;
+
+  DrawnLine(this.points, this.paint);
+}
+
+/// Custom painter that uses dart:ui Paint and Canvas
+class DrawingPainter extends CustomPainter {
+  final List<DrawnLine> lines;
+  final DrawnLine? currentLine;
+
+  DrawingPainter({required this.lines, this.currentLine});
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    for (var line in lines) {
+      _drawLine(canvas, line);
+    }
+
+    if (currentLine != null) {
+      _drawLine(canvas, currentLine!);
+    }
+  }
+
+  void _drawLine(Canvas canvas, DrawnLine line) {
+    for (int i = 0; i < line.points.length - 1; i++) {
+      if (line.points[i] != null && line.points[i + 1] != null) {
+        canvas.drawLine(line.points[i], line.points[i + 1], line.paint);
+      }
+    }
+  }
+
+  @override
+  bool shouldRepaint(DrawingPainter oldDelegate) => true;
+}
