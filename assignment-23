@@ -1,0 +1,145 @@
+Question 09: Build a Flutter application with two screens, "About" and "Home". Use a dedicated routing class and allow the background color of the Scaffold and AppBar in the About screen to be set from the Home screen.
+source code:
+import 'package:flutter/material.dart';
+
+void main() {
+  runApp(const MyApp());
+}
+
+// Routing class
+class AppRoutes {
+  static const String home = '/';
+  static const String about = '/about';
+
+  static Route<dynamic> generateRoute(RouteSettings settings) {
+    switch (settings.name) {
+      case home:
+        return MaterialPageRoute(builder: (_) => const HomeScreen());
+      case about:
+        // Extract arguments passed to About screen
+        final args = settings.arguments as AboutScreenArguments?;
+        return MaterialPageRoute(
+          builder: (_) => AboutScreen(
+            backgroundColor: args?.backgroundColor ?? Colors.blue,
+            appBarColor: args?.appBarColor ?? Colors.blueAccent,
+          ),
+        );
+      default:
+        return MaterialPageRoute(
+          builder: (_) => const Scaffold(
+            body: Center(child: Text('No route defined')),
+          ),
+        );
+    }
+  }
+}
+
+// Arguments to pass color info to About screen
+class AboutScreenArguments {
+  final Color backgroundColor;
+  final Color appBarColor;
+
+  AboutScreenArguments({required this.backgroundColor, required this.appBarColor});
+}
+
+class MyApp extends StatelessWidget {
+  const MyApp({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      title: 'Routing Example',
+      debugShowCheckedModeBanner: false,
+      initialRoute: AppRoutes.home,
+      onGenerateRoute: AppRoutes.generateRoute,
+    );
+  }
+}
+
+class HomeScreen extends StatefulWidget {
+  const HomeScreen({super.key});
+
+  @override
+  State<HomeScreen> createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen> {
+  // Colors to send to About screen
+  Color scaffoldColor = Colors.white;
+  Color appBarColor = Colors.blue;
+
+  void _changeColors() {
+    setState(() {
+      // Randomly switch colors for demo purpose
+      scaffoldColor = scaffoldColor == Colors.white ? Colors.yellow.shade100 : Colors.white;
+      appBarColor = appBarColor == Colors.blue ? Colors.deepPurple : Colors.blue;
+    });
+  }
+
+  void _navigateToAbout() {
+    Navigator.pushNamed(
+      context,
+      AppRoutes.about,
+      arguments: AboutScreenArguments(
+        backgroundColor: scaffoldColor,
+        appBarColor: appBarColor,
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Home Screen'),
+        backgroundColor: appBarColor,
+      ),
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            ElevatedButton(
+              onPressed: _changeColors,
+              child: const Text('Change Colors for About Screen'),
+            ),
+            const SizedBox(height: 20),
+            ElevatedButton(
+              onPressed: _navigateToAbout,
+              child: const Text('Go to About Screen'),
+            ),
+          ],
+        ),
+      ),
+      backgroundColor: scaffoldColor,
+    );
+  }
+}
+
+class AboutScreen extends StatelessWidget {
+  final Color backgroundColor;
+  final Color appBarColor;
+
+  const AboutScreen({
+    super.key,
+    required this.backgroundColor,
+    required this.appBarColor,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: backgroundColor,
+      appBar: AppBar(
+        title: const Text('About Screen'),
+        backgroundColor: appBarColor,
+      ),
+      body: const Center(
+        child: Text(
+          'This is the About Screen',
+          style: TextStyle(fontSize: 24),
+        ),
+      ),
+    );
+  }
+}
+
