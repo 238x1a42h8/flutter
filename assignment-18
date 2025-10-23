@@ -1,0 +1,83 @@
+Question 23: You are working on a Content-based application based on a flutter, client wants you to show a random lucky number on the click button. Which is the max limit is 350. What things will you require to achieve this Problem statement?
+Hint 1:- Add the method for generating random lucky numbers.
+Hint 2:- Add text and an Elevated button widget.
+source code:
+import 'dart:math';
+import 'package:flutter/material.dart';
+
+void main() {
+  runApp(const LuckyNumberApp());
+}
+
+class LuckyNumberApp extends StatelessWidget {
+  const LuckyNumberApp({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return const MaterialApp(
+      debugShowCheckedModeBanner: false,
+      home: LuckyNumberScreen(),
+    );
+  }
+}
+
+class LuckyNumberScreen extends StatefulWidget {
+  const LuckyNumberScreen({super.key});
+
+  @override
+  State<LuckyNumberScreen> createState() => _LuckyNumberScreenState();
+}
+
+class _LuckyNumberScreenState extends State<LuckyNumberScreen> {
+  int? luckyNumber;
+
+  // Method to generate a random lucky number between 1 and 350
+  void generateLuckyNumber() {
+    final random = Random();
+    setState(() {
+      luckyNumber = random.nextInt(350) + 1; // 1 to 350 inclusive
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Random Lucky Number Generator'),
+        backgroundColor: Colors.green,
+      ),
+      body: Center(
+        child: Padding(
+          padding: const EdgeInsets.all(24.0),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                luckyNumber == null
+                    ? 'Press the button to get your lucky number!'
+                    : 'Your Lucky Number is: $luckyNumber',
+                style: const TextStyle(
+                  fontSize: 24,
+                  fontWeight: FontWeight.bold,
+                ),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 40),
+              ElevatedButton(
+                onPressed: generateLuckyNumber,
+                style: ElevatedButton.styleFrom(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 30, vertical: 15),
+                ),
+                child: const Text(
+                  'Get Lucky Number',
+                  style: TextStyle(fontSize: 18),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
