@@ -1,0 +1,91 @@
+Question 10: Create a Flutter application using Riverpod state management where pressing a button changes the background color of the appBar and Scaffold, as well as plays one of 10 music notes. 
+import 'dart:math';
+
+import 'package:audioplayers/audioplayers.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+
+// Riverpod provider for background color state
+final backgroundColorProvider = StateProvider<Color>((ref) => Colors.white);
+
+// Audio player provider (singleton)
+final audioPlayerProvider = Provider<AudioPlayer>((ref) => AudioPlayer());
+
+// Colors list for random background color changes
+final List<Color> colors = [
+  Colors.red,
+  Colors.blue,
+  Colors.green,
+  Colors.orange,
+  Colors.purple,
+  Colors.teal,
+  Colors.yellow,
+  Colors.cyan,
+  Colors.pink,
+  Colors.indigo,
+];
+
+void main() {
+  runApp(const ProviderScope(child: MyApp()));
+}
+
+class MyApp extends ConsumerWidget {
+  const MyApp({super.key});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final backgroundColor = ref.watch(backgroundColorProvider);
+
+    return MaterialApp(
+      debugShowCheckedModeBanner: false,
+      home: Scaffold(
+        backgroundColor: backgroundColor,
+        appBar: AppBar(
+          backgroundColor: backgroundColor,
+          title: const Text('Riverpod Music & Color App'),
+          centerTitle: true,
+        ),
+        body: const Center(child: ColorMusicButton()),
+      ),
+    );
+  }
+}
+
+class ColorMusicButton extends ConsumerWidget {
+  const ColorMusicButton({super.key});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final audioPlayer = ref.read(audioPlayerProvider);
+    final random = Random();
+
+    Future<void> playRandomNote() async {
+      final noteNumber = random.nextInt(10) + 1;
+      final assetPath = 'assets/note$noteNumber.wav';
+      await audioPlayer.play(AssetSource(assetPath));
+    }
+
+    void changeColorAndPlay() {
+      final currentColor = ref.read(backgroundColorProvider);
+      Color newColor = colors[random.nextInt(colors.length)];
+
+      while (newColor == currentColor) {
+        newColor = colors[random.nextInt(colors.length)];
+      }
+
+      ref.read(backgroundColorProvider.notifier).state = newColor;
+      playRandomNote();
+    }
+
+    return ElevatedButton(
+      onPressed: changeColorAndPlay,
+      child: const Padding(
+        padding: EdgeInsets.symmetric(horizontal: 24.0, vertical: 12.0),
+        child: Text(
+          'Change Color & Play Note',
+          style: TextStyle(fontSize: 20),
+        ),
+      ),
+    );
+  }
+}
