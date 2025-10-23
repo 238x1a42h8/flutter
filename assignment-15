@@ -1,0 +1,90 @@
+Question 20: Is there any way to rotate an image clock clockwise and anti-clockwise by clicking on a single button?
+Hint 1:- Use RotationTransition widget for rotation purposes.
+Hint 2:- Add a button for controlling image rotation. 
+Sorce code:
+import 'package:flutter/material.dart';
+
+void main() {
+  runApp(const MaterialApp(
+    debugShowCheckedModeBanner: false,
+    home: RotateImageExample(),
+  ));
+}
+
+class RotateImageExample extends StatefulWidget {
+  const RotateImageExample({super.key});
+
+  @override
+  State<RotateImageExample> createState() => _RotateImageExampleState();
+}
+
+class _RotateImageExampleState extends State<RotateImageExample>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _controller;
+  bool _isClockwise = true;
+
+  @override
+  void initState() {
+    super.initState();
+
+    // AnimationController controls the rotation speed and repeat
+    _controller = AnimationController(
+      duration: const Duration(seconds: 5), // full rotation in 5 seconds
+      vsync: this,
+    )..repeat(); // start rotating continuously
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  void _toggleRotation() {
+    setState(() {
+      _isClockwise = !_isClockwise;
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Clock Rotation Example'),
+        backgroundColor: Colors.blueAccent,
+        centerTitle: true,
+      ),
+      body: Center(
+        child: RotationTransition(
+          // Use Tween to control clockwise or anti-clockwise
+          turns: Tween(begin: 0.0, end: _isClockwise ? 1.0 : -1.0)
+              .animate(_controller),
+          child: Container(
+            width: 200,
+            height: 200,
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(100),
+              boxShadow: const [
+                BoxShadow(
+                    color: Colors.black26, blurRadius: 10, spreadRadius: 3)
+              ],
+            ),
+            child: ClipOval(
+              child: Image.asset(
+                'assets/clock.png', // Add your clock image in assets
+                fit: BoxFit.cover,
+              ),
+            ),
+          ),
+        ),
+      ),
+      floatingActionButton: FloatingActionButton.extended(
+        onPressed: _toggleRotation,
+        label: Text(_isClockwise ? "Rotate Anti-Clockwise" : "Rotate Clockwise"),
+        icon: const Icon(Icons.rotate_right),
+        backgroundColor: Colors.blueAccent,
+      ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
+    );
+  }
+}
