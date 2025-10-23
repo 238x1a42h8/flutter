@@ -1,0 +1,104 @@
+Question 17: Show the start and end date in the date picker. But the end date should be 29 days ago from the start date. What will be your approach to getting this problem statement?
+Hint 1:- Use the date picker library for selecting the start and end date.
+Hint 2:- Add the logic which is end data should be 29 days ago from the start date.
+source code:
+import 'package:flutter/material.dart';
+import 'package:intl/intl.dart'; // For formatting the date
+
+void main() {
+  runApp(const MaterialApp(
+    debugShowCheckedModeBanner: false,
+    home: DatePickerExample(),
+  ));
+}
+
+class DatePickerExample extends StatefulWidget {
+  const DatePickerExample({super.key});
+
+  @override
+  State<DatePickerExample> createState() => _DatePickerExampleState();
+}
+
+class _DatePickerExampleState extends State<DatePickerExample> {
+  DateTime? startDate;
+  DateTime? endDate;
+
+  final DateFormat dateFormat = DateFormat('yyyy-MM-dd');
+
+  Future<void> _selectStartDate(BuildContext context) async {
+    final DateTime? pickedDate = await showDatePicker(
+      context: context,
+      initialDate: DateTime.now(),
+      firstDate: DateTime(2000),
+      lastDate: DateTime.now(),
+    );
+
+    if (pickedDate != null) {
+      setState(() {
+        startDate = pickedDate;
+        endDate = pickedDate.subtract(const Duration(days: 29)); // end = start - 29 days
+      });
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Date Picker Example'),
+        backgroundColor: Colors.blueAccent,
+      ),
+      body: Padding(
+        padding: const EdgeInsets.all(20.0),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            const Text(
+              "Select Start Date:",
+              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 10),
+
+            ElevatedButton(
+              onPressed: () => _selectStartDate(context),
+              child: const Text('Pick Start Date'),
+            ),
+
+            const SizedBox(height: 30),
+
+            if (startDate != null) ...[
+              Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: Colors.blue.shade50,
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Text(
+                  'Start Date: ${dateFormat.format(startDate!)}',
+                  style: const TextStyle(fontSize: 18),
+                ),
+              ),
+            ],
+
+            const SizedBox(height: 20),
+
+            if (endDate != null) ...[
+              Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: Colors.green.shade50,
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Text(
+                  'End Date (29 days ago): ${dateFormat.format(endDate!)}',
+                  style: const TextStyle(fontSize: 18),
+                ),
+              ),
+            ],
+          ],
+        ),
+      ),
+    );
+  }
+}
