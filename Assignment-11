@@ -1,0 +1,125 @@
+Question 16: How to Show this result based on the given details:
+True-answers=6
+Wrong -answers=0
+Total-questions=6
+Hint 1:- Use imageview and textview, containers for showing the image and text.
+Hint 2:- Add the logic for showing the result based on true, and false values out of total questions.
+ source code:
+import 'package:flutter/material.dart';
+
+void main() {
+  runApp(const MyApp());
+}
+
+class MyApp extends StatelessWidget {
+  const MyApp({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      debugShowCheckedModeBanner: false,
+      title: 'Quiz Result Demo',
+      theme: ThemeData(primarySwatch: Colors.blue),
+      home: const ResultScreen(
+        trueAnswers: 6,
+        wrongAnswers: 0,
+        totalQuestions: 6,
+      ),
+    );
+  }
+}
+
+class ResultScreen extends StatelessWidget {
+  final int trueAnswers;
+  final int wrongAnswers;
+  final int totalQuestions;
+
+  const ResultScreen({
+    super.key,
+    required this.trueAnswers,
+    required this.wrongAnswers,
+    required this.totalQuestions,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    // Logic to determine message and image
+    String message;
+    String imagePath;
+
+    if (trueAnswers == totalQuestions) {
+      message = "🎉 Excellent! You got all correct!";
+      imagePath = 'assets/success.png'; // add an image in assets folder
+    } else if (trueAnswers > totalQuestions / 2) {
+      message = "😊 Good job! You passed the quiz.";
+      imagePath = 'assets/good.png';
+    } else {
+      message = "😢 Better luck next time!";
+      imagePath = 'assets/fail.png';
+    }
+
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text("Quiz Result"),
+        centerTitle: true,
+      ),
+      body: Container(
+        width: double.infinity,
+        padding: const EdgeInsets.all(20),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            // Show result image
+            Image.asset(
+              imagePath,
+              height: 150,
+              width: 150,
+              fit: BoxFit.contain,
+            ),
+
+            const SizedBox(height: 20),
+
+            // Show result text
+            Text(
+              message,
+              textAlign: TextAlign.center,
+              style: const TextStyle(
+                fontSize: 22,
+                fontWeight: FontWeight.bold,
+                color: Colors.black87,
+              ),
+            ),
+
+            const SizedBox(height: 30),
+
+            // Show detailed scores
+            Container(
+              padding: const EdgeInsets.all(20),
+              decoration: BoxDecoration(
+                color: Colors.blue[50],
+                borderRadius: BorderRadius.circular(10),
+                border: Border.all(color: Colors.blueAccent),
+              ),
+              child: Column(
+                children: [
+                  Text(
+                    "✅ True Answers: $trueAnswers",
+                    style: const TextStyle(fontSize: 18, color: Colors.green),
+                  ),
+                  Text(
+                    "❌ Wrong Answers: $wrongAnswers",
+                    style: const TextStyle(fontSize: 18, color: Colors.red),
+                  ),
+                  Text(
+                    "📊 Total Questions: $totalQuestions",
+                    style: const TextStyle(fontSize: 18, color: Colors.black87),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
